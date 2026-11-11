@@ -24,7 +24,7 @@ notebook works from either the repository root or `notebooks/`.
 | 2. Environment and setup | Project-root check and dependency instructions. |
 | 3. Data inspection, cleaning and EDA | Raw-data validation, hourly demand, matched stockouts, cleaning summary. |
 | 4. Historical demand recovery | Artificial-mask dataset, feature groups, Ridge experiments, tuning, hybrid strategy and held-out recovery test. |
-| 5. Forecasting dataset | Lag/rolling/stockout/horizon features and embargoed splits. |
+| 5. Forecasting dataset | Lag/rolling/stockout/horizon features, embargoed splits and target-distribution analysis. |
 | 6. Naive baseline | Validation metrics for the rule-based baseline. |
 | 7. Linear forecasting model | Ridge training, alpha tuning and feature-importance analysis. |
 | 8. Tree-based forecasting models | Decision tree, random forest and XGBoost tuning on the validation partition. |
