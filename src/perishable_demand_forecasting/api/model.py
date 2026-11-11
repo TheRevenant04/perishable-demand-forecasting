@@ -54,7 +54,11 @@ def predict_instances(instances: list[dict]) -> list[float]:
         rows.append(row)
 
     X = np.asarray(rows, dtype=np.float32)
-    X = bundle["scaler"].transform(X)
+
+    scaler = bundle.get("scaler")
+    if scaler is not None:
+        X = scaler.transform(X)
+
     predictions = bundle["model"].predict(X)
 
     return [float(value) for value in predictions]
