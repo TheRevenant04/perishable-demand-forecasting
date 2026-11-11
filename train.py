@@ -1,8 +1,9 @@
 """Train the final demand forecasting model.
 
-The final model is a Ridge regression on the recovered daily demand
-features. It is fitted on the chronological train + validation splits
-(alpha selected on validation) and saved as a pickle file for serving.
+The final model is a Random Forest regressor selected during the
+tree-based model comparison (ML Zoomcamp module 6). It is fitted on the
+chronological train + validation splits and saved as a pickle file for
+serving.
 
 Usage:
     uv run python train.py
@@ -14,8 +15,7 @@ from pathlib import Path
 import pickle
 import numpy as np
 import polars as pl
-from sklearn.linear_model import Ridge
-from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestRegressor
 
 from perishable_demand_forecasting.config import FORECASTING_DIR, FORECASTING_MODELS_DIR
 
@@ -45,8 +45,20 @@ FUTURE_FEATURES = [
 
 FEATURES = HISTORICAL_FEATURES + FUTURE_FEATURES
 
-# Selected during validation tuning (see notebooks/notebook.ipynb).
-FINAL_ALPHA = 1.0
+# Selected during the tree-based model comparison
+# (see notebooks/notebook.ipynb and forecasting/tune_tree_forecast.py).
+# max_samples is reduced for the full-data fit so the forest stays within
+# memory on a 16 GB machine; it still uses far more rows per tree than the
+# tuning run.
+FINAL_PARAMS = {
+    "n_estimators": 60,
+    "max_depth": 14,
+    "min_samples_leaf": 20,
+    "max_samples": 0.4,
+    "max_features": 0.5,
+    "n_jobs": 8,
+    "random_state": 42,
+}
 
 
 def load_split(path: Path) -> pl.DataFrame:
@@ -96,12 +108,9 @@ def main() -> None:
     if not np.isfinite(y).all():
         raise ValueError("Training target contains non-finite values.")
 
-    print("\nStandardizing features...")
-    scaler = StandardScaler()
-    X = scaler.fit_transform(X)
-
-    print(f"\nFitting Ridge regression (alpha={FINAL_ALPHA})...")
-    model = Ridge(alpha=FINAL_ALPHA, solver="lsqr")
+    print("\nFitting Random Forest regressor...")
+    print(f"  {FINAL_PARAMS}")
+    model = RandomForestRegressor(**FINAL_PARAMS)
     model.fit(X, y)
     del X, y
 
@@ -109,10 +118,10 @@ def main() -> None:
 
     bundle = {
         "model": model,
-        "scaler": scaler,
         "features": FEATURES,
         "target": TARGET_COLUMN,
-        "alpha": FINAL_ALPHA,
+        "family": "random_forest",
+        "params": FINAL_PARAMS,
         "trained_at": datetime.now(timezone.utc).isoformat(),
         "train_rows": n_rows,
     }
@@ -124,7 +133,7 @@ def main() -> None:
     print("FINAL MODEL TRAINED")
     print("=" * 75)
     print(f"Model:    {MODEL_PATH}")
-    print(f"Alpha:    {FINAL_ALPHA}")
+    print("Family:   random_forest")
     print(f"Features: {len(FEATURES)}")
     print(f"Rows:     {n_rows:,}")
 

@@ -26,9 +26,10 @@ notebook works from either the repository root or `notebooks/`.
 | 4. Historical demand recovery | Artificial-mask dataset, feature groups, Ridge experiments, tuning, hybrid strategy and held-out recovery test. |
 | 5. Forecasting dataset | Lag/rolling/stockout/horizon features and embargoed splits. |
 | 6. Naive baseline | Validation metrics for the rule-based baseline. |
-| 7. Ridge forecasting model | Training, alpha tuning and feature-importance analysis. |
-| 8. Final evaluation | Naive vs Ridge on the untouched test partition. |
-| 9. Reproducibility | Generated artifact locations and entrypoint notes. |
+| 7. Linear forecasting model | Ridge training, alpha tuning and feature-importance analysis. |
+| 8. Tree-based forecasting models | Decision tree, random forest and XGBoost tuning on the validation partition. |
+| 9. Final evaluation | Naive vs Ridge vs Random Forest on the untouched test partition. |
+| 10. Reproducibility | Generated artifact locations and entrypoint notes. |
 
 ## Relationship to the scripts
 

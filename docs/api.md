@@ -1,7 +1,7 @@
 # Forecast API Reference
 
-The service exposes the trained Ridge model over HTTP using Flask. It loads
-`models/forecasting/final_demand_forecast.pkl` once per process.
+The service exposes the trained Random Forest model over HTTP using Flask. It
+loads `models/forecasting/final_demand_forecast.pkl` once per process.
 
 Start it with:
 
@@ -28,9 +28,9 @@ Requests and responses use JSON (`Content-Type: application/json`).
 ```json
 {
   "service": "perishable-demand-forecasting",
-  "model": "ridge_regression",
-  "alpha": 1.0,
-  "trained_at": "2026-11-11T12:13:19+00:00",
+  "model": "random_forest",
+  "params": {"n_estimators": 60, "max_depth": 14, "min_samples_leaf": 20},
+  "trained_at": "2026-11-11T13:36:16+00:00",
   "features": ["demand_lag_1", "..."],
   "endpoints": {
     "GET /health": "service status",
@@ -44,7 +44,7 @@ Requests and responses use JSON (`Content-Type: application/json`).
 Returns `200` when the artifact loads, otherwise `503`.
 
 ```json
-{"status": "ok", "model": "ridge_regression", "alpha": 1.0, "trained_at": "..."}
+{"status": "ok", "model": "random_forest", "params": {"n_estimators": 60}, "trained_at": "..."}
 ```
 
 ```json
@@ -77,22 +77,23 @@ Batch:
 | Horizon | `forecast_horizon` (1–7) |
 | Calendar | `target_weekday`, `target_month`, `target_holiday_flag` |
 
-Every instance must include all 22 fields with finite numeric values. Values are
-standardized with the saved scaler before prediction.
+Every instance must include all 22 fields with finite numeric values. Tree
+models consume the values directly; a legacy linear bundle applies its saved
+scaler before prediction.
 
 ### Success responses
 
 Single (`200`):
 
 ```json
-{"prediction": 3.2214, "target": "target_daily_demand"}
+{"prediction": 2.4694, "target": "target_daily_demand"}
 ```
 
 Batch (`200`):
 
 ```json
 {
-  "predictions": [3.2214, 0.8712, 1.5530, 2.1044, 0.4419],
+  "predictions": [2.4694, 2.2988, 1.5404, 1.6591, 1.1537],
   "count": 5,
   "target": "target_daily_demand"
 }

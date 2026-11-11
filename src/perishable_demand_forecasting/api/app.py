@@ -16,8 +16,8 @@ def create_app() -> Flask:
         return jsonify(
             {
                 "service": "perishable-demand-forecasting",
-                "model": "ridge_regression",
-                "alpha": bundle["alpha"],
+                "model": bundle.get("family", "ridge_regression"),
+                "params": bundle.get("params"),
                 "trained_at": bundle["trained_at"],
                 "features": bundle["features"],
                 "endpoints": {
@@ -37,8 +37,8 @@ def create_app() -> Flask:
         return jsonify(
             {
                 "status": "ok",
-                "model": "ridge_regression",
-                "alpha": bundle["alpha"],
+                "model": bundle.get("family", "ridge_regression"),
+                "params": bundle.get("params"),
                 "trained_at": bundle["trained_at"],
             }
         )

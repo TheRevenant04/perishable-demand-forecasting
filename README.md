@@ -33,9 +33,10 @@ The project treats forecasting as a two-stage problem:
 2. **Forecast future demand.** Use recovered demand history plus lag, calendar
    and stockout features to predict daily demand for horizons 1–7.
 
-The final Ridge model is packaged as a reproducible training script and served
-through a Flask API, so forecasts can feed replenishment and planning workflows.
-On the held-out test period it reduced MAE by **~20.6%** versus a naive baseline.
+The final Random Forest model (selected over Ridge and XGBoost) is packaged as
+a reproducible training script and served through a Flask API, so forecasts can
+feed replenishment and planning workflows. On the held-out test period it
+reduced MAE by **~22.1%** versus a naive baseline.
 
 ```text
 Raw retail data -> recovery -> recovered demand -> forecasting -> final model -> API
@@ -61,7 +62,7 @@ How each stage works: [pipeline.md](docs/pipeline.md).
 | Stage | Result |
 | --- | --- |
 | Recovery (artificial-mask test) | Hybrid MAE **0.2597** vs observed-sales **0.4188** (~38% lower) |
-| Forecasting (held-out test) | Ridge MAE **0.4074** vs Naive **0.5128** (~20.6% lower) |
+| Forecasting (held-out test) | Random Forest MAE **0.3994** vs Naive **0.5128** (~22.1% lower); Ridge **0.4074** |
 
 See [results.md](docs/results.md) for the full tables and limitations.
 

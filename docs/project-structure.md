@@ -31,7 +31,7 @@ perishable-demand-forecasting/
 
 | File | Purpose |
 | --- | --- |
-| `train.py` | Fits the final Ridge model on train + validation and saves a pickle file. |
+| `train.py` | Fits the final Random Forest on train + validation and saves a pickle file. |
 | `predict.py` | Starts the Flask service that loads the saved bundle. |
 | `Dockerfile` | Multi-stage image that installs runtime dependencies and serves the model. |
 
@@ -43,7 +43,7 @@ perishable-demand-forecasting/
 | `data/` | `download_raw_data.py` fetches the dataset; `build_daily_forecast_dataset.py` builds lag/horizon features and splits. |
 | `analysis/` | Raw-data validation, hourly demand profiling, matched-stockout comparison and stockout analysis. |
 | `recovery/` | Builds the artificial-mask recovery dataset, feature groups, Ridge experiments, tuning and hybrid evaluation. |
-| `forecasting/` | Naive baseline, Ridge training, alpha tuning and final test evaluation. |
+| `forecasting/` | Naive baseline, Ridge training and tuning, tree-based tuning (decision tree, random forest, XGBoost), and test evaluation. |
 | `api/` | `model.py` loads the artifact and predicts; `app.py` defines the Flask routes. |
 
 ## Generated directories
@@ -55,7 +55,7 @@ perishable-demand-forecasting/
 | `data/processed/freshretailnet/recovery/` | Recovery splits, metrics and severity evaluations. |
 | `data/processed/freshretailnet/forecasting/` | Forecasting splits, lag features and metrics. |
 | `models/recovery/` | Recovery experiment and regularization artifacts. |
-| `models/forecasting/` | Validation Ridge model and final `final_demand_forecast.pkl`. |
+| `models/forecasting/` | Validation candidates (Ridge, tuned tree) and the final Random Forest `final_demand_forecast.pkl`. |
 
 ## Conventions
 
