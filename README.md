@@ -70,11 +70,20 @@ See [results.md](docs/results.md) for the full tables and limitations.
 ```bash
 uv sync
 uv run python -m perishable_demand_forecasting.data.download_raw_data
+
+# Build the recovery models and forecasting datasets used by train.py
+uv run python -m perishable_demand_forecasting.recovery.build_recovery_dataset
+uv run python -m perishable_demand_forecasting.recovery.build_recovery_features
+uv run python -m perishable_demand_forecasting.recovery.select_recovery_features
+uv run python -m perishable_demand_forecasting.recovery.tune_recovery_ridge
+uv run python -m perishable_demand_forecasting.data.build_daily_forecast_dataset
+
 uv run python train.py
 uv run python predict.py
 ```
 
-Full instructions, including the complete pipeline and Docker usage, are in
+The dataset build can take several minutes. The complete pipeline (including
+evaluation), Docker usage and environment variables are in
 [setup.md](docs/setup.md).
 
 ## License
