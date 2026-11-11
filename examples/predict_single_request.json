@@ -1,0 +1,26 @@
+{
+  "features": {
+    "demand_lag_1": 0.5,
+    "demand_lag_2": 0.3,
+    "demand_lag_3": 0.8,
+    "demand_lag_4": 3.2,
+    "demand_lag_5": 3.1,
+    "demand_lag_6": 1.6,
+    "demand_lag_7": 3.1,
+    "demand_lag_8": 0.0,
+    "demand_lag_9": 1.2,
+    "demand_lag_10": 2.5248,
+    "demand_lag_11": 1.5,
+    "demand_lag_12": 6.5,
+    "demand_lag_13": 5.9,
+    "demand_lag_14": 2.6,
+    "demand_rolling_mean_7": 1.8,
+    "demand_rolling_mean_14": 2.3446,
+    "stockout_hours_lag_1": 0,
+    "stockout_hours_lag_7": 4,
+    "forecast_horizon": 1,
+    "target_weekday": 6,
+    "target_month": 6,
+    "target_holiday_flag": 1
+  }
+}
