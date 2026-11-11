@@ -55,7 +55,7 @@ uv run python train.py
 ```
 
 This fits the final Ridge model on the train + validation splits and writes
-`models/forecasting/final_demand_forecast.joblib`.
+`models/forecasting/final_demand_forecast.pkl`.
 
 ## Start the forecast service
 

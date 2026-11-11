@@ -13,7 +13,7 @@ uv run python train.py
 ```
 
 `train.py` fits `StandardScaler` + `Ridge(alpha=1.0)` on the train and validation
-splits and saves `models/forecasting/final_demand_forecast.joblib`. The bundle
+splits and saves `models/forecasting/final_demand_forecast.pkl`. The bundle
 contains the model, scaler, feature order, target name, alpha, timestamp and row
 count.
 
