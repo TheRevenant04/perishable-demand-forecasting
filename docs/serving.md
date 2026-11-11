@@ -12,10 +12,11 @@ payloads, see [api.md](api.md) and [`examples/`](../examples).
 uv run python train.py
 ```
 
-`train.py` fits `StandardScaler` + `Ridge(alpha=1.0)` on the train and validation
-splits and saves `models/forecasting/final_demand_forecast.pkl`. The bundle
-contains the model, scaler, feature order, target name, alpha, timestamp and row
-count.
+`train.py` fits the selected `RandomForestRegressor` (60 trees, tuned depth and
+leaf size) on the train and validation splits and saves
+`models/forecasting/final_demand_forecast.pkl`. The bundle contains the model,
+feature order, target name, model family, hyperparameters, timestamp and row
+count. Tree models do not need feature scaling.
 
 ## Start the service
 
@@ -69,7 +70,7 @@ curl -X POST http://localhost:8000/predict \
 Response:
 
 ```json
-{"prediction": 3.2214, "target": "target_daily_demand"}
+{"prediction": 2.4694, "target": "target_daily_demand"}
 ```
 
 Batch responses return `predictions` plus a `count`. Invalid JSON, missing

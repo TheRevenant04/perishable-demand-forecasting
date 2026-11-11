@@ -24,37 +24,55 @@ features are built.
 
 ## Seven-day forecasting
 
-Final evaluation on the held-out test partition:
+Model selection on the validation partition:
 
-| Metric | Naive | Ridge Regression |
-| --- | ---: | ---: |
-| MAE | 0.512812 | **0.407412** |
-| RMSE | 0.814507 | **0.648432** |
-| Bias | -0.037006 | -0.114638 |
+| Model | Tuned settings | MAE | RMSE | Bias |
+| --- | --- | ---: | ---: | ---: |
+| Naive (lag 1) | — | 0.477620 | 0.803075 | 0.020007 |
+| Ridge Regression | alpha=1.0 | 0.374763 | 0.604713 | 0.001554 |
+| Decision Tree | depth=12, leaf=100 | 0.368541 | 0.602604 | 0.032915 |
+| XGBoost | lr=0.05, depth=10, early stopping | 0.368517 | 0.640420 | 0.022574 |
+| Random Forest | depth=14, leaf=20, 60 trees | **0.361513** | **0.577953** | 0.031059 |
 
-Ridge achieved approximately **20.55% lower MAE** and **20.39% lower RMSE** than
-the Naive baseline, at the cost of a more negative bias.
+Decision trees, random forests and XGBoost are the tree-based models covered in
+ML Zoomcamp module 6. Their main regularization parameters are tuned on
+deterministic training samples and every candidate is scored on all 4.55M
+validation rows. Random Forest wins on validation MAE and is selected as the
+final model.
+
+Final evaluation on the untouched test partition:
+
+| Model | MAE | RMSE | Bias | Negative predictions |
+| --- | ---: | ---: | ---: | ---: |
+| Naive baseline | 0.512812 | 0.814507 | -0.037006 | 0.00% |
+| Ridge Regression | 0.407412 | **0.648432** | -0.114638 | 3.54% |
+| Random Forest (final) | **0.399386** | 0.651719 | -0.107226 | 0.00% |
+
+The Random Forest achieved approximately **22.12% lower MAE** than the Naive
+baseline and **1.97% lower MAE** than Ridge. Ridge retains a slightly lower RMSE.
+Both models have a negative bias; the forest avoids negative predictions but
+still under-forecasts on average.
 
 ## Feature importance
 
-Ridge coefficients on standardized inputs show where the forecast comes from:
+Random Forest impurity-based importances show where the forecast comes from:
 
-| Feature group | Share of absolute coefficient mass |
+| Feature group | Share of total importance |
 | --- | ---: |
-| Demand lags (1–14 days) | ~75.0% |
-| Rolling demand (7- and 14-day means) | ~14.5% |
-| Calendar fields | ~9.3% |
-| Stockout history | ~1.2% |
-| Forecast horizon | ~0.05% |
+| Rolling demand (7- and 14-day means) | ~71.7% |
+| Demand lags (1–14 days) | ~24.7% |
+| Calendar fields | ~3.3% |
+| Stockout history | ~0.2% |
+| Forecast horizon | ~0.1% |
 
-Recent demand and rolling means dominate, which is consistent with the strong
-autocorrelation of daily demand. Horizon contributes almost nothing, indicating
-the model forecasts from the historical level rather than horizon-specific
-behaviour.
+The rolling means and recent demand dominate, which is consistent with the
+strong autocorrelation of daily demand. Horizon contributes almost nothing,
+indicating the model forecasts from the historical level rather than
+horizon-specific behaviour.
 
 ## Limitations
 
 - Artificial masking is a proxy; real lost sales remain unobserved.
-- Ridge produces a small share of negative predictions (3.54% on test).
-- Bias is more negative than the Naive baseline.
+- The forest produces no negative predictions, but it under-forecasts on average.
+- Bias is more negative than the Naive baseline and similar to Ridge.
 - The approach is evaluated on one dataset and a short test period.

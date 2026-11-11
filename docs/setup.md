@@ -45,7 +45,9 @@ uv run python -m perishable_demand_forecasting.recovery.tune_recovery_ridge
 uv run python -m perishable_demand_forecasting.data.build_daily_forecast_dataset
 uv run python -m perishable_demand_forecasting.forecasting.train_ridge_forecast
 uv run python -m perishable_demand_forecasting.forecasting.tune_ridge_forecast
+uv run python -m perishable_demand_forecasting.forecasting.tune_tree_forecast
 uv run python -m perishable_demand_forecasting.forecasting.evaluate_ridge_forecast_test
+uv run python -m perishable_demand_forecasting.forecasting.evaluate_tree_forecast_test
 ```
 
 ## Train the final model
@@ -54,8 +56,8 @@ uv run python -m perishable_demand_forecasting.forecasting.evaluate_ridge_foreca
 uv run python train.py
 ```
 
-This fits the final Ridge model on the train + validation splits and writes
-`models/forecasting/final_demand_forecast.pkl`.
+This fits the final Random Forest model on the train + validation splits and
+writes `models/forecasting/final_demand_forecast.pkl`.
 
 ## Start the forecast service
 

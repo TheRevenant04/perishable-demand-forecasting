@@ -91,21 +91,29 @@ and `test.parquet` under `data/processed/freshretailnet/forecasting/`.
 | Model | Role |
 | --- | --- |
 | Naive | Predicts every horizon with `demand_lag_1`. |
-| Ridge Regression | Uses the 22 lag, rolling, stockout, horizon and calendar features. |
+| Ridge Regression (linear) | Uses the 22 lag, rolling, stockout, horizon and calendar features. Its scaler is fitted on training data only and alpha is tuned on validation. |
+| Decision Tree | Tree-based baseline with tuned `max_depth` and `min_samples_leaf`. |
+| Random Forest | Ensemble of decision trees; tuned `max_depth`, `min_samples_leaf`, `max_samples` and `max_features` (60 trees). |
+| XGBoost | Gradient boosting; tuned `learning_rate` and `max_depth` with early stopping. |
 
-The scaler is fitted on training data only. Ridge `alpha` is tuned on validation;
-differences were negligible, so `alpha=1.0` is retained.
+The three tree-based candidates follow ML Zoomcamp module 6. They are tuned on
+deterministic training samples (2M rows for the decision tree and XGBoost, 1M
+for the forest) so the comparison runs on a laptop, then scored on the full
+validation split. Random Forest has the lowest validation MAE and is selected as
+the final model; `train.py` retrains it on all 17.5M train + validation rows.
 
 ```bash
 uv run python -m perishable_demand_forecasting.forecasting.evaluate_naive_forecast
 uv run python -m perishable_demand_forecasting.forecasting.train_ridge_forecast
 uv run python -m perishable_demand_forecasting.forecasting.tune_ridge_forecast
+uv run python -m perishable_demand_forecasting.forecasting.tune_tree_forecast
 uv run python -m perishable_demand_forecasting.forecasting.evaluate_ridge_forecast_test
+uv run python -m perishable_demand_forecasting.forecasting.evaluate_tree_forecast_test
 ```
 
 ## 6. Train the final model
 
-`train.py` refits the selected configuration on train + validation and saves the
+`train.py` refits the selected Random Forest on train + validation and saves the
 bundle used by the service.
 
 ```bash
