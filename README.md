@@ -26,6 +26,17 @@ uv run python train.py
 uv run python predict.py
 ```
 
+### Run with Docker
+
+Train the model first so `models/forecasting/final_demand_forecast.joblib` exists, then build and run the service:
+
+```bash
+docker build -t perishable-demand-forecasting .
+docker run --rm -p 8000:8000 perishable-demand-forecasting
+```
+
+The service is available at `http://localhost:8000` (`GET /health`, `POST /predict`).
+
 ## The Problem
 
 Managing inventory for perishable products is a difficult balancing act.
