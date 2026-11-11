@@ -96,11 +96,11 @@ and `test.parquet` under `data/processed/freshretailnet/forecasting/`.
 | Random Forest | Ensemble of decision trees; tuned `max_depth`, `min_samples_leaf`, `max_samples` and `max_features` (60 trees). |
 | XGBoost | Gradient boosting; tuned `learning_rate` and `max_depth` with early stopping. |
 
-The three tree-based candidates follow ML Zoomcamp module 6. They are tuned on
-deterministic training samples (2M rows for the decision tree and XGBoost, 1M
-for the forest) so the comparison runs on a laptop, then scored on the full
-validation split. Random Forest has the lowest validation MAE and is selected as
-the final model; `train.py` retrains it on all 17.5M train + validation rows.
+The three tree-based candidates are tuned on deterministic training
+samples (2M rows for the decision tree and XGBoost, 1M for the forest) so
+the comparison runs on a laptop, then scored on the full validation split.
+Random Forest has the lowest validation MAE and is selected as the final
+model; `train.py` retrains it on all 17.5M train + validation rows.
 
 ```bash
 uv run python -m perishable_demand_forecasting.forecasting.evaluate_naive_forecast

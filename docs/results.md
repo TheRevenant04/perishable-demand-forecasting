@@ -34,11 +34,10 @@ Model selection on the validation partition:
 | XGBoost | lr=0.05, depth=10, early stopping | 0.368517 | 0.640420 | 0.022574 |
 | Random Forest | depth=14, leaf=20, 60 trees | **0.361513** | **0.577953** | 0.031059 |
 
-Decision trees, random forests and XGBoost are the tree-based models covered in
-ML Zoomcamp module 6. Their main regularization parameters are tuned on
-deterministic training samples and every candidate is scored on all 4.55M
-validation rows. Random Forest wins on validation MAE and is selected as the
-final model.
+Decision trees, random forests and XGBoost are compared as the tree-based
+candidates. Their main regularization parameters are tuned on deterministic
+training samples and every candidate is scored on all 4.55M validation rows.
+Random Forest wins on validation MAE and is selected as the final model.
 
 Final evaluation on the untouched test partition:
 
