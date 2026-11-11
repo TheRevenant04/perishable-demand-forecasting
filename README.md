@@ -1,18 +1,38 @@
 # Perishable Demand Forecasting
 
-An intelligent demand forecasting system for perishable retail products.
+An intelligent demand estimation and forecasting platform designed to help retailers understand customer demand, anticipate stockouts, optimize inventory and reduce perishable product waste.
 
-The system helps retailers estimate **true product demand and forecast future demand**, including demand that may be hidden when products are temporarily out of stock.
+The system estimates **underlying product demand** and forecasts future demand, accounting for sales that may be hidden when products are temporarily unavailable.
 
----
+## Project Structure
+
+```text
+train.py                        # train the final model -> models/
+predict.py                      # start the forecast web service
+src/perishable_demand_forecasting/
+├── config.py                   # centralised project paths and constants
+├── data/                       # dataset download and daily dataset preparation
+├── analysis/                   # dataset inspection and stockout analysis
+├── recovery/                   # latent demand recovery: datasets, features, models, evaluation
+├── forecasting/                # demand forecasting models and evaluation
+└── api/                        # online inference: model loading and Flask routes
+```
+
+Run workflow modules from the repository root, e.g.:
+
+```bash
+uv run python -m perishable_demand_forecasting.analysis.inspect_raw_dataset
+uv run python train.py
+uv run python predict.py
+```
 
 ## The Problem
 
 Managing inventory for perishable products is a difficult balancing act.
 
-If a retailer orders too little, products sell out before customers have finished buying them. This results in lost sales and poor product availability.
+If a retailer orders too little, products may sell out before customers have finished buying them. This results in lost sales, reduced product availability and dissatisfied customers.
 
-If a retailer orders too much, products may remain unsold until they approach their expiry or shelf-life limit, resulting in markdowns, waste, and lost margin.
+If a retailer orders too much, products may remain unsold until they approach their expiry or shelf-life limit, resulting in markdowns, waste and lost margins.
 
 The problem is made harder by the data retailers typically use to make these decisions:
 
@@ -22,27 +42,25 @@ Consider a product that sells 50 units before a store runs out of stock. The ret
 
 The remaining 20 units of potential demand are invisible in the sales data.
 
-This means a forecasting system that learns directly from historical sales can learn the wrong lesson:
+A forecasting system that learns directly from historical sales can therefore learn the wrong lesson:
 
 ```text
 Low recorded sales
         ↓
-Low forecast
+Low demand forecast
         ↓
-Low inventory
+Insufficient inventory
         ↓
 Stockout
         ↓
 Even more lost sales
 ```
 
-Perishable products make this problem particularly important because retailers must simultaneously manage **availability, inventory cost, and product waste**.
-
----
+Perishable products make this problem particularly important because retailers must simultaneously manage **product availability, inventory costs and product waste**.
 
 ## The Solution
 
-The system uses machine learning to estimate **underlying demand** and forecast future demand for individual products and stores.
+Perishable Demand Forecasting uses machine learning to estimate underlying demand and forecast future demand for individual products and stores.
 
 Rather than treating every historical sales observation as an accurate representation of demand, the system considers the conditions under which those sales occurred.
 
@@ -58,54 +76,52 @@ It combines information such as:
 - Store characteristics
 - Product characteristics
 
-The resulting forecast is intended to answer a more useful business question:
+The resulting forecasts aim to answer a more useful business question:
 
 > **How much of this product are customers likely to demand during the forecast period?**
 
-rather than simply:
+Rather than simply:
 
 > **How much did the store sell last time?**
-
----
 
 ## Product Workflow
 
 ```text
-              Retail Data
-                   │
-                   ▼
-        ┌─────────────────────┐
-        │ Data Preparation    │
-        │ & Validation        │
-        └──────────┬──────────┘
-                   │
-                   ▼
-        ┌─────────────────────┐
-        │ Stockout Detection  │
-        └──────────┬──────────┘
-                   │
-                   ▼
-        ┌─────────────────────┐
-        │ Demand Estimation   │
-        │ & Recovery          │
-        └──────────┬──────────┘
-                   │
-                   ▼
-        ┌─────────────────────┐
-        │ Demand Forecasting  │
-        └──────────┬──────────┘
-                   │
-                   ▼
-        ┌─────────────────────┐
-        │ Forecast API        │
-        └──────────┬──────────┘
-                   │
-                   ▼
-        Inventory Planning
-        & Decision Support
+                  Retail Data
+                       |
+                       ▼
+             ┌─────────────────────┐
+             │  Data Preparation   │
+             │  & Validation       │
+             └──────────┬──────────┘
+                        |
+                        ▼
+             ┌─────────────────────┐
+             │  Stockout Detection │
+             └──────────┬──────────┘
+                        |
+                        ▼
+             ┌─────────────────────┐
+             │  Demand Estimation  │
+             │  & Recovery         │
+             └──────────┬──────────┘
+                        |
+                        ▼
+             ┌─────────────────────┐
+             │  Demand Forecasting │
+             └──────────┬──────────┘
+                        |
+                        ▼
+             ┌─────────────────────┐
+             │  Forecast API       │
+             └──────────┬──────────┘
+                        |
+                        ▼
+              Inventory Planning
+               & Decision Support
 ```
 
-The forecasting service can provide expected demand for a specific **product, store, and future time period**.
+The forecasting service provides expected demand for a specific product, store and future time period.
 
 For example:
 
@@ -117,17 +133,15 @@ Period:      Tomorrow
 Confidence:  68–78 units
 ```
 
-The forecast can then become an input into inventory replenishment and planning workflows.
-
----
+Forecasts can become inputs into inventory replenishment, purchasing and planning workflows.
 
 ## Dataset
 
 The initial data source is **FreshRetailNet-50K**, a large-scale retail dataset released by Dingdong Inc. for research into demand estimation and forecasting in fresh retail.
 
-[FreshRetailNet-50K on Hugging Face](https://huggingface.co/datasets/Dingdong-Inc/FreshRetailNet-50K?utm_source=chatgpt.com)
+[FreshRetailNet-50K on Hugging Face](https://huggingface.co/datasets/Dingdong-Inc/FreshRetailNet-50K)
 
-The dataset contains information covering:
+### Dataset Characteristics
 
 | Attribute            | Description                                   |
 | -------------------- | --------------------------------------------- |
@@ -135,14 +149,15 @@ The dataset contains information covering:
 | Stores               | 898                                           |
 | Cities               | 18                                            |
 | Perishable SKUs      | 865                                           |
-| Time span            | 90 days                                       |
-| Sales                | Hourly sales information                      |
+| Training period      | 90 days                                       |
+| Evaluation period    | 7 days                                        |
+| Sales                | Daily and hourly sales information            |
 | Stock availability   | Hourly stock-status information               |
 | Promotions           | Discount and activity information             |
 | Calendar             | Holiday information                           |
 | Weather              | Temperature, precipitation, humidity and wind |
 
-The dataset contains naturally occurring stockout observations, making it particularly valuable for developing demand forecasts that account for constrained sales.
+The dataset contains naturally occurring stockout observations, making it valuable for developing demand estimation and forecasting methods that account for constrained sales.
 
 ### Research Reference
 
@@ -150,167 +165,162 @@ FreshRetailNet-50K was introduced in:
 
 **FreshRetailNet-50K: A Stockout-Annotated Censored Demand Dataset for Latent Demand Recovery and Forecasting in Fresh Retail**
 
-[Research paper](https://arxiv.org/abs/2505.16319?utm_source=chatgpt.com)
-
----
+[Research paper](https://arxiv.org/abs/2505.16319)
 
 ## Machine Learning Approach
 
 The system treats demand forecasting as more than a straightforward time-series prediction problem.
 
-### 1. Detect constrained sales
+### 1. Detect Constrained Sales
 
 Identify periods where observed sales may have been affected by product unavailability.
 
-### 2. Estimate underlying demand
+### 2. Estimate Underlying Demand
 
 Estimate the demand that could have occurred if the product had remained available.
 
-### 3. Forecast future demand
+### 3. Forecast Future Demand
 
-Use recovered demand together with temporal, product, store, promotional, and environmental features to forecast future demand.
+Use recovered demand together with temporal, product, store, promotional and environmental features to forecast future demand.
 
-### 4. Evaluate business-relevant performance
+### 4. Evaluate Business-Relevant Performance
 
-The system evaluates not only overall forecasting accuracy, but also how well it performs during and around stockout events.
+Evaluate forecasting accuracy across multiple time horizons, products, stores and stockout conditions.
 
-The exact modelling approach is intentionally not fixed. Different forecasting and demand-recovery methods will be evaluated against strong baselines.
-
----
+The modelling approach is designed to evolve as additional data, features and forecasting techniques become available.
 
 ## Business Value
 
-A more accurate demand forecast can help retailers make better inventory decisions.
+More accurate demand estimates and forecasts can help retailers make better inventory decisions.
 
-### Reduce stockouts
+### Reduce Stockouts
 
-Better estimates of demand can help identify products that are likely to sell out.
+Better estimates of demand help identify products that are likely to sell out, supporting more effective replenishment planning.
 
-### Reduce waste
+### Reduce Waste
 
-Better forecasts can reduce unnecessary inventory of products with short shelf lives.
+Improved forecasts help retailers avoid unnecessary inventory of products with short shelf lives.
 
-### Improve availability
+### Improve Product Availability
 
-Maintaining the right inventory levels helps ensure products are available when customers want them.
+Maintaining appropriate inventory levels helps ensure products are available when customers want them.
 
-### Improve inventory planning
+### Improve Inventory Planning
 
-Forecasts can provide a consistent, data-driven input for replenishment and purchasing decisions.
+Forecasts provide a consistent, data-driven input for replenishment, purchasing and inventory management workflows.
 
 Ultimately, the goal is to help retailers find a better balance between:
 
 **Availability ↔ Inventory Cost ↔ Product Waste**
 
----
-
 ## Forecasting Capabilities
 
-The system is designed around store-product level forecasting and can be extended to support:
+The system is designed around store-product-level forecasting and supports the development of capabilities such as:
 
 - Product demand forecasts
 - Store-level demand forecasts
 - Multiple forecast horizons
-- Demand trends
+- Demand trends and seasonality analysis
 - Stockout risk identification
 - Forecast confidence intervals
-- Historical vs. forecast demand analysis
+- Historical versus forecast demand analysis
 - Forecast performance monitoring
+- Inventory planning and replenishment support
 
----
+## Model Evaluation
 
-## Evaluation
+Forecasting performance is evaluated using chronological training, validation and test datasets.
 
-Model performance will be measured using time-series validation and forecasting metrics such as:
+Evaluation metrics include:
 
-- MAE
-- RMSE
-- sMAPE
+- Mean Absolute Error (MAE)
+- Root Mean Squared Error (RMSE)
 - Forecast bias
 
-Performance will also be analyzed across:
+Performance is also analyzed across:
 
+- Forecast horizons
 - Products
 - Stores
 - Demand levels
 - Stockout conditions
 - Time periods
 
-A key performance question is:
+### Current Forecasting Results
 
-> **Does explicitly accounting for stockouts produce better demand forecasts than forecasting directly from observed sales?**
+The current forecasting implementation evaluates two approaches:
 
----
+- **Naive Forecasting:** Uses the most recent recovered daily demand as the forecast.
+- **Ridge Regression:** Uses historical demand and contextual features to predict future demand.
+
+Final evaluation on the held-out test dataset:
+
+| Metric |     Naive | Ridge Regression |
+| ------ | --------: | ---------------: |
+| MAE    |  0.512812 |     **0.407412** |
+| RMSE   |  0.814507 |     **0.648432** |
+| Bias   | -0.037006 |        -0.114638 |
+
+Ridge Regression achieved:
+
+- **20.55% lower MAE**
+- **20.39% lower RMSE**
+
+These results demonstrate the value of incorporating historical demand patterns and contextual information into the forecasting process.
+
+The evaluation also tracks negative predictions and forecast bias to identify areas requiring further improvement.
 
 ## Production Architecture
 
-The system is designed to evolve into a production-ready forecasting service.
+The system is designed to evolve into a production-ready forecasting platform.
 
 ```text
-                    ┌─────────────────┐
-                    │  Retail Data    │
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │ Data Pipeline   │
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │ Feature Store / │
-                    │ Feature Pipeline│
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │ Forecast Model  │
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │ Forecast API    │
-                    └────────┬────────┘
-                             │
-                 ┌───────────┴───────────┐
-                 ▼                       ▼
-          Planning Tools          Retail Systems
+                  ┌──────────────────┐
+                  │   Retail Data    │
+                  └────────┬─────────┘
+                           |
+                           ▼
+                  ┌──────────────────┐
+                  │  Data Pipeline   │
+                  └────────┬─────────┘
+                           |
+                           ▼
+                  ┌──────────────────┐
+                  │ Feature Store /  │
+                  │ Feature Pipeline │
+                  └────────┬─────────┘
+                           |
+                           ▼
+                  ┌──────────────────┐
+                  │  Forecast Model  │
+                  └────────┬─────────┘
+                           |
+                           ▼
+                  ┌──────────────────┐
+                  │  Forecast API    │
+                  └────────┬─────────┘
+                           |
+                 ┌─────────┴─────────┐
+                 ▼                   ▼
+          Planning Tools       Retail Systems
 ```
 
-The architecture allows the forecasting model to be replaced or improved without requiring major changes to the surrounding application.
+The architecture separates data processing, feature engineering, model development and forecast delivery.
 
----
-
-## Technology
-
-The implementation will use a modern machine-learning and production engineering stack.
-
-The technology choices will evolve as the system develops, but the architecture is intended to support:
-
-- Python
-- Pandas / Polars
-- Scikit-learn and/or specialized forecasting libraries
-- REST API
-- Containerized deployment
-- Automated model training
-- Model versioning
-- Monitoring and evaluation
-
----
+This allows forecasting models to be replaced, improved or extended without requiring major changes to the surrounding application.
 
 ## Project Goals
 
-The product aims to provide a reliable demand forecasting capability that can:
+Perishable Demand Forecasting aims to provide a reliable demand estimation and forecasting capability that can:
 
-- Estimate demand despite historical stockouts
-- Forecast future demand at store-product level
-- Incorporate relevant contextual information
-- Provide measurable forecast accuracy
-- Expose forecasts through a production-ready API
-- Support model monitoring and future retraining
-- Scale to additional retailers and datasets
-
----
+- Estimate underlying demand despite historical stockouts.
+- Forecast future demand at store-product level.
+- Incorporate relevant contextual information.
+- Improve inventory planning and replenishment decisions.
+- Provide measurable forecasting accuracy.
+- Expose forecasts through a production-ready API.
+- Support model monitoring and continuous improvement.
+- Scale to additional retailers and datasets.
 
 ## Data License
 
@@ -319,3 +329,5 @@ FreshRetailNet-50K is released under the **CC BY 4.0** license.
 Users should review the dataset's licensing terms before using the data commercially.
 
 ---
+
+**Perishable Demand Forecasting — Turning retail sales data into better demand intelligence.**
