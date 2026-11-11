@@ -1,10 +1,10 @@
 """Tune tree-based models for seven-day demand forecasting.
 
-Implements the model family taught in ML Zoomcamp module 6
-(decision trees, random forest and XGBoost) and tunes their main
-regularization parameters on a deterministic sample of the training
-split. Every candidate is scored on the full validation split using the
-same MAE/RMSE/bias protocol as the Ridge experiments.
+Implements the tree-based model family (decision trees, random forest
+and XGBoost) and tunes their main regularization parameters on a
+deterministic sample of the training split. Every candidate is scored on
+the full validation split using the same MAE/RMSE/bias protocol as the
+Ridge experiments.
 
 Usage:
     uv run python -m perishable_demand_forecasting.forecasting.tune_tree_forecast
@@ -168,7 +168,7 @@ def tune_decision_tree(
     X_validation: np.ndarray,
     validation: pl.DataFrame,
 ) -> tuple[list[dict], dict]:
-    """Tune tree depth and minimum leaf size (Zoomcamp 6.5)."""
+    """Tune tree depth and minimum leaf size."""
 
     results: list[dict] = []
     best: dict | None = None
@@ -202,7 +202,7 @@ def tune_random_forest(
     X_validation: np.ndarray,
     validation: pl.DataFrame,
 ) -> tuple[list[dict], dict]:
-    """Tune forest depth and minimum leaf size (Zoomcamp 6.6)."""
+    """Tune forest depth and minimum leaf size."""
 
     results: list[dict] = []
     best: dict | None = None
@@ -241,7 +241,7 @@ def tune_xgboost(
     X_validation: np.ndarray,
     validation: pl.DataFrame,
 ) -> tuple[list[dict], dict]:
-    """Tune learning rate and depth with early stopping (Zoomcamp 6.8)."""
+    """Tune learning rate and depth with early stopping."""
 
     results: list[dict] = []
     best: dict | None = None

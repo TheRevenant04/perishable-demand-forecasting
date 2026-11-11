@@ -1,9 +1,8 @@
 """Train the final demand forecasting model.
 
 The final model is a Random Forest regressor selected during the
-tree-based model comparison (ML Zoomcamp module 6). It is fitted on the
-chronological train + validation splits and saved as a pickle file for
-serving.
+tree-based model comparison. It is fitted on the chronological
+train + validation splits and saved as a pickle file for serving.
 
 Usage:
     uv run python train.py
