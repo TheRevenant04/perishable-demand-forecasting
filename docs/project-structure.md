@@ -31,7 +31,7 @@ perishable-demand-forecasting/
 
 | File | Purpose |
 | --- | --- |
-| `train.py` | Fits the final Ridge model on train + validation and saves a joblib bundle. |
+| `train.py` | Fits the final Ridge model on train + validation and saves a pickle file. |
 | `predict.py` | Starts the Flask service that loads the saved bundle. |
 | `Dockerfile` | Multi-stage image that installs runtime dependencies and serves the model. |
 
@@ -55,7 +55,7 @@ perishable-demand-forecasting/
 | `data/processed/freshretailnet/recovery/` | Recovery splits, metrics and severity evaluations. |
 | `data/processed/freshretailnet/forecasting/` | Forecasting splits, lag features and metrics. |
 | `models/recovery/` | Recovery experiment and regularization artifacts. |
-| `models/forecasting/` | Validation Ridge model and final `final_demand_forecast.joblib`. |
+| `models/forecasting/` | Validation Ridge model and final `final_demand_forecast.pkl`. |
 
 ## Conventions
 
@@ -63,5 +63,5 @@ perishable-demand-forecasting/
   `uv run python -m perishable_demand_forecasting.analysis.inspect_raw_dataset`.
 - Data-processing modules read and write the paths defined in `config.py`, so
   they can be invoked from any working directory.
-- The serving layer never imports training code; the joblib artifact is the
+- The serving layer never imports training code; the pickle artifact is the
   boundary between the two halves of the project.

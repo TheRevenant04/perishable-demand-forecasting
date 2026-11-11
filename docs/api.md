@@ -1,7 +1,7 @@
 # Forecast API Reference
 
 The service exposes the trained Ridge model over HTTP using Flask. It loads
-`models/forecasting/final_demand_forecast.joblib` once per process.
+`models/forecasting/final_demand_forecast.pkl` once per process.
 
 Start it with:
 

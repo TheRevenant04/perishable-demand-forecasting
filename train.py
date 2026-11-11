@@ -2,7 +2,7 @@
 
 The final model is a Ridge regression on the recovered daily demand
 features. It is fitted on the chronological train + validation splits
-(alpha selected on validation) and saved as a joblib bundle for serving.
+(alpha selected on validation) and saved as a pickle file for serving.
 
 Usage:
     uv run python train.py
@@ -11,7 +11,7 @@ Usage:
 from datetime import datetime, timezone
 from pathlib import Path
 
-import joblib
+import pickle
 import numpy as np
 import polars as pl
 from sklearn.linear_model import Ridge
@@ -21,7 +21,7 @@ from perishable_demand_forecasting.config import FORECASTING_DIR, FORECASTING_MO
 
 TRAIN_PATH = FORECASTING_DIR / "train.parquet"
 VALIDATION_PATH = FORECASTING_DIR / "validation.parquet"
-MODEL_PATH = FORECASTING_MODELS_DIR / "final_demand_forecast.joblib"
+MODEL_PATH = FORECASTING_MODELS_DIR / "final_demand_forecast.pkl"
 
 TARGET_COLUMN = "target_daily_demand"
 HORIZON_COLUMN = "forecast_horizon"
@@ -117,7 +117,8 @@ def main() -> None:
         "train_rows": n_rows,
     }
 
-    joblib.dump(bundle, MODEL_PATH)
+    with MODEL_PATH.open("wb") as file:
+        pickle.dump(bundle, file)
 
     print("\n" + "=" * 75)
     print("FINAL MODEL TRAINED")

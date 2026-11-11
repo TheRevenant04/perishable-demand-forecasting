@@ -3,12 +3,12 @@
 from functools import lru_cache
 from pathlib import Path
 
-import joblib
+import pickle
 import numpy as np
 
 from perishable_demand_forecasting.config import FORECASTING_MODELS_DIR
 
-MODEL_PATH = FORECASTING_MODELS_DIR / "final_demand_forecast.joblib"
+MODEL_PATH = FORECASTING_MODELS_DIR / "final_demand_forecast.pkl"
 
 
 @lru_cache(maxsize=1)
@@ -20,7 +20,8 @@ def load_model(path: Path = MODEL_PATH) -> dict:
             f"Trained model not found: {path}. Run `uv run python train.py` first."
         )
 
-    return joblib.load(path)
+    with path.open("rb") as file:
+        return pickle.load(file)
 
 
 def predict_instances(instances: list[dict]) -> list[float]:
