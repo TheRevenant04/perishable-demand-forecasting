@@ -83,9 +83,46 @@ uv run python train.py
 uv run python predict.py
 ```
 
+`uv sync` creates `.venv`; activation is optional because every command uses
+`uv run`, but you can activate it manually:
+
+```bash
+source .venv/bin/activate    # macOS / Linux
+.venv\Scripts\activate       # Windows
+```
+
 The dataset build can take several minutes. The complete pipeline (including
 evaluation), Docker usage and environment variables are in
 [setup.md](docs/setup.md).
+
+To review the end-to-end narrative, open the notebook:
+
+```bash
+uv run jupyter notebook notebooks/notebook.ipynb
+```
+
+## Docker
+
+Build the image after training the model, then run the service:
+
+```bash
+uv run python train.py
+docker build -t perishable-demand-forecasting .
+docker run --rm -p 8000:8000 perishable-demand-forecasting
+```
+
+Check the container:
+
+```bash
+curl http://localhost:8000/health
+curl -X POST http://localhost:8000/predict \
+  -H "Content-Type: application/json" \
+  --data @examples/predict_single_request.json
+```
+
+The image installs dependencies with `uv`, runs as a non-root user, ships the
+artifact from `models/forecasting/final_demand_forecast.pkl`, and exposes port
+`8000`. See [serving.md](docs/serving.md) for details.
 
 ## License
 
